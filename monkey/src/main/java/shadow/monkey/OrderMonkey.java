@@ -16,7 +16,7 @@ public class OrderMonkey extends MonkeyImpl {
 	private boolean signedUp;
 
 	public OrderMonkey(String adr) {
-		super(adr);
+		super(0, adr);
 		this.signedUp = false;
 		this.email = null;
 		this.password = null;

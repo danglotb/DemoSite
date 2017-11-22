@@ -14,12 +14,8 @@ import java.util.stream.Collectors;
  */
 public class RandomMonkey extends MonkeyImpl {
 
-    public RandomMonkey(String adr) {
-        super(adr);
-    }
-
-    public RandomMonkey(String adr, int seed) {
-        super(adr, seed);
+    public RandomMonkey(int index, String adr, int seed) {
+        super(index, adr, seed);
     }
 
     private void clickOnLink() throws Exception {

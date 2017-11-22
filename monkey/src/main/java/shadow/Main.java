@@ -1,10 +1,8 @@
 package shadow;
 
-import org.eclipse.jetty.io.ssl.SslClientConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import shadow.budget.Budget;
 import shadow.budget.NbRequestBudget;
 import shadow.explorer.Explorer;
@@ -48,24 +46,29 @@ public class Main {
 
     public static Explorer explorer;
 
+    public static int nbMonkey = 3;
+
+    public static Budget budget;
+
+    public static int initialBudget = 120;
+
     public static void main(String[] args) throws Exception {
         Server server = new Server(PORT + 1);
         ServletContextHandler contextHandler = new ServletContextHandler();
         server.setHandler(contextHandler);
         Oracle oracle = new CodeStatusOracle();
-        Budget budget = new NbRequestBudget(5000);
+        budget = new NbRequestBudget(120);
         Manager managerPerturbation = new RandomManager(ADR_PROD, 23);
         explorer = new HistoryExplorer(budget, oracle, managerPerturbation, ADR_PROD);
         HistoryProxy servlet = new HistoryProxy(ADR_PROD, PORT, explorer);
         contextHandler.addServlet(new ServletHolder(servlet), "/*");
-        int nbMonkey = 3;
         try {
             nbMonkey = Integer.parseInt(args[0]);
         } catch (Exception ignored) {
             // ignored using default value
         }
         for (int i = 0; i < nbMonkey; i++) {
-            monkeys.add(runMonkey());
+            monkeys.add(runMonkey(i));
         }
         try {
             server.start();
@@ -79,8 +82,8 @@ public class Main {
         }
     }
 
-    private static Monkey runMonkey() {
-        Monkey monkey = new RandomMonkey(LOCALHOST + ":" + (PORT + 1), seeds[monkeys.size()]);
+    private static Monkey runMonkey(int index) {
+        Monkey monkey = new RandomMonkey(index, LOCALHOST + ":" + (PORT + 1), seeds[monkeys.size()]);
         try {
             new Thread(() -> {
                 try {

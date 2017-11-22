@@ -14,8 +14,12 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -78,6 +82,7 @@ public class View extends Application {
 		final XYChart.Data<String, Number> dataFailure = new XYChart.Data<>(STRING_PERC_FAILURE, 0.0f);
 		seriesFail.getData().add(dataFailure);
 
+		ProgressIndicator progressIndicator = new ProgressIndicator(0.0F);
 		Timeline tl = new Timeline();
 		tl.getKeyFrames().add(new KeyFrame(Duration.millis(500), actionEvent -> {
 			int[] states = this.logger.getState();
@@ -89,6 +94,7 @@ public class View extends Application {
 			dataPercPerturbed.setYValue(percPerturbed);
 			dataSuccess.setYValue(success);
 			dataFailure.setYValue(failure);
+			progressIndicator.setProgress((float)states[0] / (float) Main.initialBudget);
 		}));
 		tl.setCycleCount(Animation.INDEFINITE);
 		tl.play();
@@ -98,7 +104,11 @@ public class View extends Application {
 		bc.getData().addAll(seriesSuccess, seriesFail);
 		this.setColorsCorrectness(bc);
 
-		scene = new Scene(getHBox(bcPerturb, bc), 800, 600);
+		final VBox vBox = new VBox();
+		vBox.getChildren().add(getHBox(bcPerturb, bc));
+		vBox.getChildren().add(progressIndicator);
+
+		scene = new Scene(vBox, 800, 600);
 
 		stage.setScene(scene);
 		stage.show();
